@@ -21,6 +21,12 @@ async def sof(request: Request):
         tmp_path = tmp.name
 
     try:
+        killall = subprocess.run(
+            ["sudo", "killall", "/opt/altera131/quartus/bin/jtagd"], capture_output=True)
+        print(killall)
+        jtagd = subprocess.run(
+            ["sudo", "/opt/altera131/quartus/bin/jtagd"], capture_output=True)
+        print(jtagd)
         pgm = subprocess.run(
             [
                 "/home/milos/.wine/drive_c/altera/13.1/quartus/bin/quartus_pgm.exe",
