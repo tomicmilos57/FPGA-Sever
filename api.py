@@ -1,5 +1,6 @@
-import tempfile
 from fastapi import FastAPI, Request
+import os
+import tempfile
 import subprocess
 
 app = FastAPI()
@@ -19,16 +20,20 @@ async def sof(request: Request):
         tmp.write(binary)
         tmp_path = tmp.name
 
-    pgm = subprocess.run(
-        [
-            "/home/milos/.wine/drive_c/altera/13.1/quartus/bin/quartus_pgm.exe",
-            "--mode=JTAG",
-            f"--operation=P;{tmp_path}"
-        ],
-        capture_output=True
-    )
-    print(pgm)
-    return {"message": len(binary)}
+    try:
+        pgm = subprocess.run(
+            [
+                "/home/milos/.wine/drive_c/altera/13.1/quartus/bin/quartus_pgm.exe",
+                "--mode=JTAG",
+                f"--operation=P;{tmp_path}"
+            ],
+            capture_output=True
+        )
+        print(pgm)
+        return {"message": len(binary)}
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
 
 if __name__ == "__main__":
     uvicorn.run("example:app", host="127.0.0.1", port=5000, reload=True)
